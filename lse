@@ -1,0 +1,175 @@
+#!/bin/bash
+
+
+base_dir=$(dirname $0)
+name=`basename $0`
+
+
+bold=`tput bold`
+normal=`tput sgr0`
+
+# help
+# ––––––––––––––––––––––––––––––––––––––––––––––––––
+unset usage
+usage() {
+  cat << EOF
+
+${bold}NAME${normal}
+    ${bold}${name}${normal}
+
+${bold}SYNOPSIS${normal}
+    ${bold}${name}${normal} [${bold}-halp${normal}] PROGRAM
+    search directories in path in order for instances of program
+
+${bold}DESCRIPTION${normal}
+    [ ${bold}-h${normal} ]                                  get help (display this page)
+    [ ${bold}-a${normal} ]                                  list files in every directory in path. after -a, all other options are passed directly to ls, not lse
+    [ ${bold}-l${normal} ]                                  list all directories in path, without any files
+    [ ${bold}-p${normal} ]                                  list executables with their full path, one per line
+
+EOF
+}
+
+
+
+
+
+# temporarily remove duplicates from $PATH
+# ––––––––––––––––––––––––––––––––––––––––––––––––––
+if [ -n "$PATH" ]; then
+  old_PATH=$PATH:; PATH=
+  while [ -n "$old_PATH" ]; do
+    x=${old_PATH%%:*}       # the first remaining entry
+    case $PATH: in
+      *:"$x":*) ;;          # already there
+      *) PATH=$PATH:$x;;    # not there yet
+    esac
+    old_PATH=${old_PATH#*:}
+  done
+  PATH=${PATH#:}
+  unset old_PATH x
+fi
+
+
+
+
+displaypath=""
+
+
+
+p=`echo $PATH`
+IFS=':'
+
+# parse options and arguments
+# ––––––––––––––––––––––––––––––––––––––––––––––––––
+while getopts ":halp" opt; do
+  case $opt in
+
+    # invoke usage function to print help to the screen
+    # ––––––––––––––––––––––––––––––
+    h)
+      usage
+      exit 0
+    ;;
+
+    # pass each directory in path as argument to ls, along with all options specified after -a
+    # ––––––––––––––––––––––––––––––
+    a)
+      shift
+      for i in $p; do
+        ls "$@" "$i" 2>/dev/null
+      done
+      exit 0
+    ;;
+
+    # show all directories in $PATH
+    # ––––––––––––––––––––––––––––––
+    l)
+      shift
+      for i in $p; do
+        echo "$i"
+      done
+      exit 0
+    ;;
+
+    # display full directory path for all executables
+    # ––––––––––––––––––––––––––––––
+    p)
+      shift
+      displaypath=1
+    ;;
+
+
+    # error messages
+    # ––––––––––––––––––––––––––––––
+    \?)
+      echo "invalid option: -$OPTARG"
+      usage
+      exit 1
+    ;;
+    :)
+      echo "error: option -$OPTARG requires an argument"
+      usage
+      exit 1
+    ;;
+  esac
+done
+
+
+
+
+
+# execute program logic
+# ––––––––––––––––––––––––––––––––––––––––––––––––––
+
+    # without an executable specified
+    # ––––––––––––––––––––––––––––––
+if [ -z $1 ]; then
+  for i in $p; do
+
+    if [ -z $displaypath ]; then
+      ls "$i" 2>/dev/null
+    else
+      ls "$i" 2>/dev/null | while read x; do echo "$i/${bold}$x${normal}"; done
+    fi
+
+  done
+  exit 0
+fi
+
+
+
+
+
+    # with an executable specified
+    # ––––––––––––––––––––––––––––––
+found=""
+
+echo
+for i in $p; do
+  text=""
+
+  # get long listing so that permissions and path can be included in output
+  text=`ls -l "$i/$1" 2>/dev/null`
+
+  if [ ! -z "$text" ]; then
+    found=1
+
+    perm=`echo $text | awk '{print $1}'`
+    IFS='/' read -r prefix prog <<< "$text"
+
+    # echo -e "$perm\t/${bold}$prog${normal}"
+    echo -e "$perm\t/`dirname $prog`/${bold}`basename $prog`${normal}"
+  fi
+done
+
+
+if [ -z "$found" ]; then
+  echo "the file ${bold}$1${normal} is not in your path"
+  exit 1
+fi
+
+
+
+
+exit 0
