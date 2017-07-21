@@ -1,9 +1,7 @@
 #!/bin/bash
 
-
 base_dir=$(dirname $0)
 name=`basename $0`
-
 
 bold=`tput bold`
 normal=`tput sgr0`
@@ -30,10 +28,6 @@ ${bold}DESCRIPTION${normal}
 EOF
 }
 
-
-
-
-
 # temporarily remove duplicates from $PATH
 # ––––––––––––––––––––––––––––––––––––––––––––––––––
 if [ -n "$PATH" ]; then
@@ -50,11 +44,7 @@ if [ -n "$PATH" ]; then
   unset old_PATH x
 fi
 
-
-
-
 displaypath=""
-
 
 
 p=`echo $PATH`
@@ -99,7 +89,6 @@ while getopts ":halp" opt; do
       displaypath=1
     ;;
 
-
     # error messages
     # ––––––––––––––––––––––––––––––
     \?)
@@ -114,9 +103,6 @@ while getopts ":halp" opt; do
     ;;
   esac
 done
-
-
-
 
 
 # execute program logic
@@ -136,9 +122,6 @@ if [ -z $1 ]; then
   done
   exit 0
 fi
-
-
-
 
 
     # with an executable specified
@@ -163,13 +146,9 @@ for i in $p; do
   fi
 done
 
-
 if [ -z "$found" ]; then
   echo "the file ${bold}$1${normal} is not in your path"
   exit 1
 fi
-
-
-
 
 exit 0
