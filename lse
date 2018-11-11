@@ -46,7 +46,6 @@ fi
 
 displaypath=""
 
-
 p=`echo $PATH`
 IFS=':'
 
@@ -104,12 +103,11 @@ while getopts ":halp" opt; do
   esac
 done
 
-
 # execute program logic
 # ––––––––––––––––––––––––––––––––––––––––––––––––––
 
-    # without an executable specified
-    # ––––––––––––––––––––––––––––––
+# without an executable specified
+# ––––––––––––––––––––––––––––––
 if [ -z $1 ]; then
   for i in $p; do
 
@@ -123,9 +121,8 @@ if [ -z $1 ]; then
   exit 0
 fi
 
-
-    # with an executable specified
-    # ––––––––––––––––––––––––––––––
+# with an executable specified
+# ––––––––––––––––––––––––––––––
 found=""
 
 echo

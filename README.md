@@ -1,9 +1,17 @@
-## other scripts
+# lse (list executables)
+a better version of the bash built-in `which`
 
-### lse (list executables)
-an alternate version of the bash built-in `which`, with some extra bells and whistles
+## usage
+imagine you have two versions of `npm` in your `$PATH`. running `lse npm` might return the following:
 
-### usage
+~~~
+lrwxr-xr-x     /usr/local/bin/npm -> ../lib/node_modules/npm/bin/npm-cli.js
+lrwxr-xr-x     /usr/local/opt/node@8/bin/npm -> ../lib/node_modules/npm/bin/npm-cli.js
+~~~
+
+lse returns all npm executables in your path, in order, with their permissions and their symlinks resolved
+
+## other usage
 ```
 -h            get help (display this page)
 -a            list files in every directory in path. after -a, all other options are passed directly to ls, not lse
